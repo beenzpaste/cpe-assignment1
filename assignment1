@@ -1,0 +1,108 @@
+/*-------------------------------------------------*/
+/* Name: Sheena Chiang, Student Number: hc3550 */
+/* Date: Sunday, October 15th, 2023 */
+/* Program: main.cpp */
+/* Description: This program computes the linear model relating salinity and temperature based on a user file. Then, it computes the corresponding temperature of a user input salinity value based on the computed model. */
+/*-------------------------------------------------*/
+
+#include <iostream>
+#include <fstream>
+#include <iomanip>
+
+using namespace std;
+
+int main() {
+    
+    // initialize variables
+    int n(0), opt(0);
+    double m(0), b(0), x, y, sumx(0), sumy(0), sumx2(0), sumxy(0), sal;
+    string fileName;
+    
+    cout << "This program determines the linear model computing the freezing temperature of seawater based on a salinity value. ";
+    
+    // create input file stream inFile
+    ifstream inFile;
+    
+    // create loop for program that only ends when user inputs (3)
+    while (opt !=3){
+        // looped menu that takes in user choice "opt"
+        cout << "Please enter the integer of your desired function below:\n";
+        cout << "(1) Determine linear model\n";
+        cout << "(2) Compute freezing temperature of seawater based on model in (1)\n";
+        cout << "(3) Exit program\n" ;
+        cin >> opt;
+        
+        // switch statement that takes menu choice "opt"
+        switch (opt){
+                
+            // menu option (1)
+            case 1:
+            {
+                cout << "Please input your file name with extension\n";
+                cin >> fileName;
+                
+                // opens file of user-given file name into inFile
+                inFile.open(fileName);
+                
+                // program reports error and returns to menu if file fails to open
+                if (inFile.fail()){
+                    cout << "Error opening file. \n\n";
+                    continue;
+                }
+                
+                // removes first line (header) from file
+                string temp;
+                getline (inFile, temp);
+                
+                // values enter x and y before file ends
+                while (!inFile.eof()){
+                    inFile >> x >> y;
+                    
+                    // n tracks number of entries
+                    n++;
+                    
+                    // sum totals are added in the loop
+                    sumx += x;
+                    sumy += y;
+                    sumx2 += (x*x);
+                    sumxy += (x*y);
+                }
+                // compute m and b values
+                m = (sumx*sumy-n*sumxy)/(sumx*sumx-n*sumx2);
+                b = (sumx*sumxy-sumx2*sumy)/(sumx*sumx-n*sumx2);
+                cout << "Your linear model has been computed. ";
+                break;
+            }
+              
+            // menu option (2)
+            case 2:
+                cout << "Please input your nonnegative salinity value: ";
+                cin >> sal;
+                
+                // loop to prevent negative salinity values
+                while (sal < 0){
+                    cout << "Your salinity value must be nonnegative. Please input your salinity value: ";
+                    cin >> sal;
+                }
+                
+                // check if option (1) has been run before computing
+                if (m!=0 && b!=0)
+                    cout << "Your computed corresponding freezing temperature is " << std::setprecision(6) << m*sal+b << " F\n\n";
+                else
+                    cout << "You must find a linear model using option 1 first.\n";
+                break;
+            
+            // menu option (3) : exit program
+            case 3:
+                cout << "Your program has ended." << endl;
+                exit (-1);
+                
+            // handles outlier cases
+            default:
+                cout << "You have entered an invalid menu option. \n\n";
+                break;
+        }
+    }
+    
+    return 0;
+}
